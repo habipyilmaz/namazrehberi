@@ -9,26 +9,27 @@ jobs:
     runs-on: ubuntu-latest
     environment: NamazRehberi
     steps:
-      - name: Trigger cPanel Git Pull + Deploy
-        run: |
-          RESPONSE=$(curl -s -k -w "\nHTTP_STATUS:%{http_code}" \
-            -H "Authorization: cpanel ${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_API_TOKEN }}" \
-            "https://${{ secrets.CPANEL_HOST }}:2083/execute/Git/update?repository_root=/home/namazrehberi/anasite")
-          echo "$RESPONSE"
-          STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
-          if [ "$STATUS" -ne 200 ]; then
-            echo "Git update failed"
-            exit 1
-          fi
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Trigger cPanel Deploy
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Package build output
         run: |
-          RESPONSE=$(curl -s -k -w "\nHTTP_STATUS:%{http_code}" \
-            -H "Authorization: cpanel ${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_API_TOKEN }}" \
-            "https://${{ secrets.CPANEL_HOST }}:2083/execute/Git/deploy?repository_root=/home/namazrehberi/anasite")
-          echo "$RESPONSE"
-          STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
-          if [ "$STATUS" -ne 200 ]; then
-            echo "Git deploy failed"
-            exit 1
-          fi
+          tar -czf deploy.tar.gz .next public package.json package-lock.json next.config.mjs server.js jsconfig.json postcss.config.mjs
+
+      - name: Upload to cPanel
+        run: |
+          curl -s -k -X POST \
+            -F "secret=${{ secrets.DEPLOY_SECRET }}" \
+            -F "package=@deploy.tar.gz" \
+            "https://namazrehberi.com/deploy-hook-x7f9k2.php"
