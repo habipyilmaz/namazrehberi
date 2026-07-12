@@ -9,18 +9,26 @@ jobs:
     runs-on: ubuntu-latest
     environment: NamazRehberi
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.CPANEL_SSH_HOST }}
-          port: ${{ secrets.CPANEL_SSH_PORT }}
-          username: ${{ secrets.CPANEL_SSH_USER }}
-          key: ${{ secrets.CPANEL_SSH_KEY }}
-          passphrase: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
-          script: |
-            cd /home/namazrehberi/anasite
-            git pull origin main
-            npm install --production
-            npm run build
-            mkdir -p tmp
-            touch tmp/restart.txt
+      - name: Trigger cPanel Git Pull + Deploy
+        run: |
+          RESPONSE=$(curl -s -k -w "\nHTTP_STATUS:%{http_code}" \
+            -H "Authorization: cpanel ${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_API_TOKEN }}" \
+            "https://${{ secrets.CPANEL_HOST }}:2083/execute/Git/update?repository_root=/home/namazrehberi/anasite")
+          echo "$RESPONSE"
+          STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Git update failed"
+            exit 1
+          fi
+
+      - name: Trigger cPanel Deploy
+        run: |
+          RESPONSE=$(curl -s -k -w "\nHTTP_STATUS:%{http_code}" \
+            -H "Authorization: cpanel ${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_API_TOKEN }}" \
+            "https://${{ secrets.CPANEL_HOST }}:2083/execute/Git/deploy?repository_root=/home/namazrehberi/anasite")
+          echo "$RESPONSE"
+          STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Git deploy failed"
+            exit 1
+          fi

@@ -2,4 +2,9 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/namazrehberi/anasite/
+    - export NODE_BIN=/home/namazrehberi/nodevenv/anasite/24/bin
     - /bin/cp -R * $DEPLOYPATH
+    - $NODE_BIN/npm --prefix $DEPLOYPATH install --production
+    - $NODE_BIN/npm --prefix $DEPLOYPATH run build
+    - mkdir -p $DEPLOYPATH/tmp
+    - touch $DEPLOYPATH/tmp/restart.txt
