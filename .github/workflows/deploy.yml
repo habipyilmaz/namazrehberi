@@ -1,35 +1,7 @@
-name: Deploy to cPanel
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment: NamazRehberi
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
-      - name: Package build output
-        run: |
-          tar -czf deploy.tar.gz .next public package.json package-lock.json next.config.mjs server.js jsconfig.json postcss.config.mjs
-
-      - name: Upload to cPanel
+- name: Upload to cPanel
         run: |
           curl -s -k -X POST \
+            -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36" \
             -F "secret=${{ secrets.DEPLOY_SECRET }}" \
             -F "package=@deploy.tar.gz" \
             "https://namazrehberi.com/deploy-hook-x7f9k2.php"
