@@ -6,21 +6,8 @@ export default function Home() {
     <div>
       
        <h1>SAV</h1>
-      <h1>YA NEBİ SELAM ALEYKE</h1>      
-       <h1>SAV</h1>
-      <h1>YA NEBİ SELAM ALEYKE</h1>      
-       <h1>SAV</h1>
-      <h1>YA NEBİ SELAM ALEYKE</h1>      
-       <h1>SAV</h1>
-      <h1>YA NEBİ SELAM ALEYKE</h1>      
-       <h1>SAV</h1>
-      <h1>YA NEBİ SELAM ALEYKE</h1>      
-       <h1>SAV</h1>
-      <h1>YA NEBİ SELAM ALEYKE</h1>      
-       <h1>SAV</h1>
-      <h1>YA NEBİ SELAM ALEYKE</h1>      
-       <h1>SAV</h1>
-      <h1>YA NEBİ SELAM ALEYKE</h1>
+      <h1>BÖLME İŞLEMİ YAPTIK ARULARDA</h1>      
+        <h1>SAV</h1>
     </div>
     </div>
   );
