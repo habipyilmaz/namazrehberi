@@ -5,7 +5,7 @@ export default function Home() {
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
     <div>
       
-       <h1>SAV - selam</h1>
+       <h1>SAV - selam - 1</h1>
       <h1>BÖLME İŞLEMİ YAPTIK ARILARDA ÇOK ŞÜKÜR İNŞALLAH BAŞARILI OLUR</h1>      
         <h1>SAV</h1>
     </div>

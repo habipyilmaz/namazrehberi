@@ -1,7 +1,50 @@
-- name: Upload to cPanel
-        run: |
-          curl -s -k -X POST \
-            -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36" \
-            -F "secret=${{ secrets.DEPLOY_SECRET }}" \
-            -F "package=@deploy.tar.gz" \
-            "https://namazrehberi.com/deploy-hook-x7f9k2.php"
+name: Deploy to cPanel
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: npm install --production
+    
+    - name: Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
+    
+    - name: Deploy to cPanel via SSH
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        REMOTE_HOST: ${{ secrets.CPANEL_HOST }}
+        REMOTE_USER: ${{ secrets.CPANEL_USERNAME }}
+        REMOTE_PORT: ${{ secrets.SSH_PORT }}
+        SOURCE: "."
+        TARGET: "/home/namazrehberi/anasite"
+        EXCLUDE: ".git, .github, node_modules, .next, .env.local"
+    
+    - name: Install dependencies on server
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        REMOTE_HOST: ${{ secrets.CPANEL_HOST }}
+        REMOTE_USER: ${{ secrets.CPANEL_USERNAME }}
+        REMOTE_PORT: ${{ secrets.SSH_PORT }}
+        SCRIPT: |
+          cd /home/namazrehberi/anasite
+          npm install --production
+          # Passenger'a restart sinyali gönder
+          touch tmp/restart.txt
