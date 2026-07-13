@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "Namaz Rehberi Sitesi",
-  description: "Namaz Rehberi - SAV ",
+  description: "Namaz Rehberi - SAV - 2 ",
 };
 
 export default function RootLayout({ children }) {
